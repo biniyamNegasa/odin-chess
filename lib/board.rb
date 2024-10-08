@@ -9,6 +9,19 @@ class Board
     @board = initial_position
   end
 
+  def move(position, destination)
+    row_pos, col_pos = position
+    row_dest, col_dest = destination
+
+    val = @board[row_pos][col_pos]
+    @board[row_pos][col_pos] = 0
+    @board[row_dest][col_dest] = val
+  end
+
+  def inbound?(row, col)
+    row.between(0, SIZE - 1) && col.between(0, SIZE - 1)
+  end
+
   private
 
   def initial_position
