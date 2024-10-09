@@ -9,22 +9,23 @@ class Board
     @board = initial_position
   end
 
-  def valid_move_pawn?(position, destination)
-    return false unless inbound?(destination[0], destination[1])
+  def reachable?(prev_val, destination)
+    row, col = destination
+    return false unless inbound?(row, col)
 
+    dest_val = board[row][col]
+    return false if prev_val.negative? && dest_val.negative? || prev_val.positive? && dest_val.positive?
+
+    true
+  end
+
+  def valid_move_pawn?(position, destination)
     val = board[position[0]][position[1]]
+    return false unless reachable?(val, destination)
 
     left = position[1] - 1
     right = position[1] + 1
-    if val.negative?
-      return false if board[destination[0]][destination[1]].negative?
-
-      row = position[0] - 1
-    else
-      return false if board[destination[0]][destination[1]].positive?
-
-      row = position[0] + 1
-    end
+    row = position[0] + (val.negative? ? -1 : 1)
     if (inbound?(row, left) && destination == [row, left]) ||
        (inbound?(row, right) && destination == [row, right]) ||
        (inbound?(row, left + 1) && board[row][left + 1].zero? && destination == [row, left + 1])
