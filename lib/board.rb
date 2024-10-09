@@ -20,22 +20,8 @@ class Board
   end
 
   def valid_move_bishop?(position, destination)
-    val = board[position[0]][position[1]]
-    return false unless reachable?(val, destination)
-
     directions = [[1, 1], [1, -1], [-1, 1], [-1, -1]]
-    directions.each do |r, c|
-      nr = position[0] + r
-      nc = position[1] + c
-      while inbound?(nr, nc) && destination != [nr, nc]
-        break if board[nr][nc] != 0
-
-        nr += r
-        nc += c
-      end
-      return true if destination == [nr, nc]
-    end
-    false
+    valid_move_loop?(position, destination, directions)
   end
 
   def valid_move_pawn?(position, destination)
@@ -68,6 +54,36 @@ class Board
   end
 
   private
+
+  def valid_move_loop?(position, destination, directions)
+    val = board[position[0]][position[1]]
+    return false unless reachable?(val, destination)
+
+    directions.each do |r, c|
+      nr = position[0] + r
+      nc = position[1] + c
+      while inbound?(nr, nc) && destination != [nr, nc]
+        break if board[nr][nc] != 0
+
+        nr += r
+        nc += c
+      end
+      return true if destination == [nr, nc]
+    end
+    false
+  end
+
+  def valid_move_condition?(position, destination, directions)
+    val = board[position[0]][position[1]]
+    return false unless reachable?(val, destination)
+
+    directions.each do |r, c|
+      nr = position[0] + r
+      nc = position[1] + c
+      return true if destination == [nr, nc]
+    end
+    false
+  end
 
   def initial_position
     array = []
