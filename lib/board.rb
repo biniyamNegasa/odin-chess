@@ -19,6 +19,16 @@ class Board
     true
   end
 
+  def valid_move_queen?(position, destination)
+    directions = [[0, 1], [1, 0], [-1, 0], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]
+    valid_move_loop?(position, destination, directions)
+  end
+
+  def valid_move_rook?(position, destination)
+    directions = [[0, 1], [1, 0], [-1, 0], [0, -1]]
+    valid_move_loop?(position, destination, directions)
+  end
+
   def valid_move_bishop?(position, destination)
     directions = [[1, 1], [1, -1], [-1, 1], [-1, -1]]
     valid_move_loop?(position, destination, directions)
