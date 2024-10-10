@@ -7,7 +7,7 @@ class Board
              -3 => "\u2657 ", -2 => "\u2655 ", -1 => "\u2654 ",
              6 => "\u265f ", 5 => "\u265c ", 4 => "\u265e ",
              3 => "\u265d ", 2 => "\u265b ", 1 => "\u265a ", 0 => '  ' }.freeze
-  COLORS = { 0 => '[47m', 1 => '[100m' }.freeze
+  COLORS = { 0 => '[47', 1 => '[100' }.freeze
   attr_reader :board
 
   def initialize
@@ -18,10 +18,12 @@ class Board
     board.each_with_index do |lst, i|
       lst.each_with_index do |elm, j|
         val = (i + j) % 2
-        print "\033#{COLORS[val]}#{SHAPES[elm]}"
+        fg_color = piece_color(elm)
+        print "\033#{COLORS[val]};#{fg_color}m#{SHAPES[elm]}"
       end
       puts "\033[0m"
     end
+    puts
   end
 
   def reachable?(prev_val, destination)
@@ -89,6 +91,19 @@ class Board
   end
 
   private
+
+  def piece_color(number)
+    white = '37'
+    red_on_black = '30;31'
+    nothing = '1'
+    if number.negative?
+      white
+    elsif number.positive?
+      red_on_black
+    else
+      nothing
+    end
+  end
 
   def valid_move_loop?(position, destination, directions)
     val = board[position[0]][position[1]]
