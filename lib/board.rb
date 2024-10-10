@@ -3,10 +3,25 @@
 # A chess board
 class Board
   SIZE = 8
+  SHAPES = { -6 => "\u2659 ", -5 => "\u2656 ", -4 => "\u2658 ",
+             -3 => "\u2657 ", -2 => "\u2655 ", -1 => "\u2654 ",
+             6 => "\u265f ", 5 => "\u265c ", 4 => "\u265e ",
+             3 => "\u265d ", 2 => "\u265b ", 1 => "\u265a ", 0 => '  ' }.freeze
+  COLORS = { 0 => '[47m', 1 => '[100m' }.freeze
   attr_reader :board
 
   def initialize
     @board = initial_position
+  end
+
+  def pretty_print
+    board.each_with_index do |lst, i|
+      lst.each_with_index do |elm, j|
+        val = (i + j) % 2
+        print "\033#{COLORS[val]}#{SHAPES[elm]}"
+      end
+      puts "\033[0m"
+    end
   end
 
   def reachable?(prev_val, destination)
@@ -123,11 +138,11 @@ class Board
 
   def set_first_row!(array)
     [0, 7].each do |row|
-      curr = 5
+      curr = row.zero? ? 5 : -5
       3.times do |ind|
         array[row][ind] = curr
-        array[row][SIZE - ind - 1] = -curr
-        curr -= 1
+        array[row][SIZE - ind - 1] = curr
+        curr -= row.zero? ? 1 : -1
       end
       array[row][3] = row.zero? ? 2 : -2
       array[row][4] = row.zero? ? 1 : -1
