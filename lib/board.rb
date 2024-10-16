@@ -28,6 +28,49 @@ class Board
     puts
   end
 
+  def castle(position, destination)
+    row_pos, col_pos = position
+    row_dest, col_dest = destination
+
+    col_pos, col_dest = col_dest, col_pos if col_pos > col_dest
+    if board[row_pos][col_pos][1] == 'r'
+      move([row_pos, col_pos], [row_dest, col_dest - 1])
+      move([row_dest, col_dest], [row_dest, col_dest - 2])
+    else
+      move([row_dest, col_dest], [row_dest, col_pos + 1])
+      move([row_pos, col_pos], [row_dest, col_pos + 2])
+    end
+  end
+
+  def castle?(position, destination)
+    row_pos, col_pos = position
+    row_dest, col_dest = destination
+    pos_val = board[row_pos][col_pos]
+    dest_val = board[row_dest][col_dest]
+    return false if @current_moves[pos_val].positive? || @current_moves[dest_val].positive?
+
+    return false if pos_val[0] != dest_val[0]
+
+    return false unless (pos_val[1] == 'r' && dest_val[1] == 'k') || (pos_val[1] == 'k' && dest_val[1] == 'r')
+
+    if col_pos < col_dest
+      curr = col_pos + 1
+      while curr < col_dest
+        return false if board[row_pos][curr] != '000'
+
+        curr += 1
+      end
+    else
+      curr = col_pos - 1
+      while curr > col_dest
+        return false if board[row_pos][curr] != '000'
+
+        curr -= 1
+      end
+    end
+    true
+  end
+
   def reachable?(prev_val, destination)
     row, col = destination
     return false unless inbound?(row, col)
@@ -147,8 +190,8 @@ class Board
     array << %w[br1 bn1 bb1 bq1 bk1 bb2 bn2 br2]
     array << %w[bp1 bp2 bp3 bp4 bp5 bp6 bp7 bp8]
     4.times { array << %w[000 000 000 000 000 000 000 000] }
-    array << %w[wr1 wn1 wb1 wq1 wk1 wb2 wn2 wr2]
     array << %w[wp1 wp2 wp3 wp4 wp5 wp6 wp7 wp8]
+    array << %w[wr1 wn1 wb1 wq1 wk1 wb2 wn2 wr2]
     array
   end
 end
