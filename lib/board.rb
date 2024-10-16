@@ -2,24 +2,26 @@
 
 # A chess board
 class Board
+  PIECE_NUM_MAP = { 'r' => 5, 'n' => 4, 'b' => 3, 'q' => 2, 'k' => 1, 'p' => 6, '0' => 0 }.freeze
   SIZE = 8
   SHAPES = { -6 => "\u2659 ", -5 => "\u2656 ", -4 => "\u2658 ",
              -3 => "\u2657 ", -2 => "\u2655 ", -1 => "\u2654 ",
              6 => "\u265f ", 5 => "\u265c ", 4 => "\u265e ",
              3 => "\u265d ", 2 => "\u265b ", 1 => "\u265a ", 0 => '  ' }.freeze
   COLORS = { 0 => '[47', 1 => '[100' }.freeze
+  SIGNS = { 'w' => -1, 'b' => 1, '0' => 1 }.freeze
   attr_reader :board
 
   def initialize
     @board = initial_position
+    @current_moves = Hash.new(0)
   end
 
   def pretty_print
     board.each_with_index do |lst, i|
-      lst.each_with_index do |elm, j|
-        val = (i + j) % 2
-        fg_color = piece_color(elm)
-        print "\033#{COLORS[val]};#{fg_color}m#{SHAPES[elm]}"
+      lst.each_with_index do |curr, j|
+        elm = SIGNS[curr[0]] * PIECE_NUM_MAP[curr[1]]
+        print "\033#{COLORS[(i + j) % 2]};#{piece_color(elm)}m#{SHAPES[elm]}"
       end
       puts "\033[0m"
     end
@@ -30,7 +32,8 @@ class Board
     row, col = destination
     return false unless inbound?(row, col)
 
-    dest_val = board[row][col]
+    curr = board[row][col]
+    dest_val = SIGNS[curr[0]] * PIECE_NUM_MAP[curr[1]]
     return false if prev_val.negative? && dest_val.negative? || prev_val.positive? && dest_val.positive?
 
     true
@@ -62,7 +65,8 @@ class Board
   end
 
   def valid_move_pawn?(position, destination)
-    val = board[position[0]][position[1]]
+    curr = board[position[0]][position[1]]
+    val = SIGNS[curr[0]] * PIECE_NUM_MAP[curr[1]]
     return false unless reachable?(val, destination)
 
     left = position[1] - 1
@@ -82,8 +86,9 @@ class Board
     row_dest, col_dest = destination
 
     val = board[row_pos][col_pos]
-    @board[row_pos][col_pos] = 0
+    @board[row_pos][col_pos] = '000'
     @board[row_dest][col_dest] = val
+    @current_moves[val] += 1
   end
 
   def inbound?(row, col)
@@ -106,7 +111,8 @@ class Board
   end
 
   def valid_move_loop?(position, destination, directions)
-    val = board[position[0]][position[1]]
+    curr = board[position[0]][position[1]]
+    val = SIGNS[curr[0]] * PIECE_NUM_MAP[curr[1]]
     return false unless reachable?(val, destination)
 
     directions.each do |r, c|
@@ -124,7 +130,8 @@ class Board
   end
 
   def valid_move_condition?(position, destination, directions)
-    val = board[position[0]][position[1]]
+    curr = board[position[0]][position[1]]
+    val = SIGNS[curr[0]] * PIECE_NUM_MAP[curr[1]]
     return false unless reachable?(val, destination)
 
     directions.each do |r, c|
@@ -137,30 +144,11 @@ class Board
 
   def initial_position
     array = []
-    SIZE.times { array << [0] * SIZE }
-    set_first_row!(array)
-    set_second_row!(array)
+    array << %w[br1 bn1 bb1 bq1 bk1 bb2 bn2 br2]
+    array << %w[bp1 bp2 bp3 bp4 bp5 bp6 bp7 bp8]
+    4.times { array << %w[000 000 000 000 000 000 000 000] }
+    array << %w[wr1 wn1 wb1 wq1 wk1 wb2 wn2 wr2]
+    array << %w[wp1 wp2 wp3 wp4 wp5 wp6 wp7 wp8]
     array
-  end
-
-  def set_second_row!(array)
-    [1, 6].each do |row|
-      array[row].each_with_index do |_, index|
-        array[row][index] = row == 1 ? 6 : -6
-      end
-    end
-  end
-
-  def set_first_row!(array)
-    [0, 7].each do |row|
-      curr = row.zero? ? 5 : -5
-      3.times do |ind|
-        array[row][ind] = curr
-        array[row][SIZE - ind - 1] = curr
-        curr -= row.zero? ? 1 : -1
-      end
-      array[row][3] = row.zero? ? 2 : -2
-      array[row][4] = row.zero? ? 1 : -1
-    end
   end
 end
