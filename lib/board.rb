@@ -15,6 +15,8 @@ class Board
   def initialize
     @board = initial_position
     @current_moves = Hash.new(0)
+    @piece_count = { 'wb' => 3, 'wr' => 3, 'wk' => 2, 'wq' => 2, 'wn' => 3, 'wp' => 9, 'bb' => 3, 'br' => 3, 'bk' => 2,
+                     'bq' => 2, 'bn' => 3, 'bp' => 9 }
   end
 
   def pretty_print
@@ -26,6 +28,23 @@ class Board
       puts "\033[0m"
     end
     puts
+  end
+
+  def promote(position, choice) # rubocop:disable Metrics/AbcSize
+    current = board[position[0]][position[1]]
+    board[position[0]][position[1]] = "#{current[0]}#{choice}#{@piece_count[current[0] + choice]}"
+    @piece_count[current[0] + choice] += 1
+    @current_moves[board[position[0]][position[1]]] = @current_moves[current]
+  end
+
+  def promote?(position)
+    row_pos, col_pos = position
+    color, piece, = board[row_pos][col_pos].split('')
+    return false unless [0, 7].include?(row_pos)
+    return false unless piece == 'p'
+    return false if color == 'w' && row_pos == 7 || color == 'b' && row_pos.zero?
+
+    true
   end
 
   def castle(position, destination)
