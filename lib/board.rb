@@ -133,13 +133,76 @@ class Board
 
     left = position[1] - 1
     right = position[1] + 1
-    row = position[0] + (val.negative? ? -1 : 1)
-    if (inbound?(row, left) && destination == [row, left]) ||
-       (inbound?(row, right) && destination == [row, right]) ||
-       (inbound?(row, left + 1) && board[row][left + 1].zero? && destination == [row, left + 1])
-      true
+    if curr[0] == 'w'
+      row = position[0] - 1
+      if board[destination[0]][destination[1]] == '000'
+        if destination == [row, position[1]]
+          return true
+        elsif inbound?(row, position[1]) && board[row][position[1]] == '000' && destination == [row - 1, position[1]]
+          return true
+        end
+      end
+
+      if inbound?(row, left) && destination == [row, left]
+        return true unless board[row][left] == '000'
+
+        check = row + 1
+        unless inbound?(check, left) && board[check][left][..1] == 'bp' && @current_moves[board[check][left]] == 1
+          return false
+        end
+
+        board[check][left] = '000'
+        true
+
+      elsif inbound?(row, right) && destination == [row, right]
+        return true unless board[row][right] == '000'
+
+        check = row + 1
+        unless inbound?(check.right) && board[check][right][..1] == 'bp' && @current_moves[board[check][right]] == 1
+          return false
+        end
+
+        board[check][right] = '000'
+        true
+      else
+        false
+
+      end
     else
-      false
+      row = position[0] + 1
+      if board[destination[0]][destination[1]] == '000'
+        if destination == [row, position[1]]
+          return true
+        elsif inbound?(row, position[1]) && board[row][position[1]] == '000' && destination == [row + 1, position[1]]
+          return true
+        end
+      end
+
+      if inbound?(row, left) && destination == [row, left]
+        return true unless board[row][left] == '000'
+
+        check = row - 1
+        unless inbound?(check, left) && board[check][left][..1] == 'wp' && @current_moves[board[check][left]] == 1
+          return false
+        end
+
+        board[check][left] = '000'
+        true
+
+      elsif inbound?(row, right) && destination == [row, right]
+        return true unless board[row][right] == '000'
+
+        check = row - 1
+        unless inbound?(check.right) && board[check][right][..1] == 'wp' && @current_moves[board[check][right]] == 1
+          return false
+        end
+
+        board[check][right] = '000'
+        true
+      else
+        false
+
+      end
     end
   end
 
@@ -154,7 +217,7 @@ class Board
   end
 
   def inbound?(row, col)
-    row.between(0, SIZE - 1) && col.between(0, SIZE - 1)
+    row.between?(0, SIZE - 1) && col.between?(0, SIZE - 1)
   end
 
   private
