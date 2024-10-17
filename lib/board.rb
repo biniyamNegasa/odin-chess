@@ -259,12 +259,9 @@ class Board
     val = SIGNS[curr[0]] * PIECE_NUM_MAP[curr[1]]
     return false unless reachable?(val, destination)
 
-    directions.each do |r, c|
-      nr = position[0] + r
-      nc = position[1] + c
-      return true if destination == [nr, nc]
+    directions.any? do |r, c|
+      destination == [position[0] + r, position[1] + c]
     end
-    false
   end
 
   def initial_position
