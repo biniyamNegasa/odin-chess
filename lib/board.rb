@@ -240,18 +240,17 @@ class Board
     val = SIGNS[curr[0]] * PIECE_NUM_MAP[curr[1]]
     return false unless reachable?(val, destination)
 
-    directions.each do |r, c|
+    directions.any? do |r, c|
       nr = position[0] + r
       nc = position[1] + c
       while inbound?(nr, nc) && destination != [nr, nc]
-        break if board[nr][nc] != 0
+        break if board[nr][nc] != '000'
 
         nr += r
         nc += c
       end
-      return true if destination == [nr, nc]
+      destination == [nr, nc]
     end
-    false
   end
 
   def valid_move_condition?(position, destination, directions)
