@@ -21,13 +21,16 @@ class Board
 
   def pretty_print
     board.each_with_index do |lst, i|
+      print "#{i} "
       lst.each_with_index do |curr, j|
         elm = SIGNS[curr[0]] * PIECE_NUM_MAP[curr[1]]
         print "\033#{COLORS[(i + j) % 2]};#{piece_color(elm)}m#{SHAPES[elm]}"
       end
       puts "\033[0m"
     end
-    puts
+    print '  '
+    SIZE.times { |val| print "#{val} " }
+    puts "\n\n"
   end
 
   def promote(position, choice) # rubocop:disable Metrics/AbcSize
