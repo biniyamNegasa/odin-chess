@@ -47,6 +47,23 @@ class Board
     true
   end
 
+  def in_check?(position)
+    row_pos, col_pos = position
+    color, = board[row_pos][col_pos].split('')
+    board.each_with_index do |lst, i|
+      lst.each_with_index do |elm, j|
+        next unless elm[0] != color && elm[0] != '0'
+        return true if elm[1] == 'p' && valid_move_pawn?([i, j], [row_pos, col_pos])
+        return true if elm[1] == 'k' && valid_move_king?([i, j], [row_pos, col_pos])
+        return true if elm[1] == 'n' && valid_move_knight?([i, j], [row_pos, col_pos])
+        return true if elm[1] == 'b' && valid_move_bishop?([i, j], [row_pos, col_pos])
+        return true if elm[1] == 'r' && valid_move_rook?([i, j], [row_pos, col_pos])
+        return true if elm[1] == 'q' && valid_move_queen?([i, j], [row_pos, col_pos])
+      end
+    end
+    false
+  end
+
   def castle(position, destination)
     row_pos, col_pos = position
     row_dest, col_dest = destination
