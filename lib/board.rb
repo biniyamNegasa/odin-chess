@@ -50,18 +50,106 @@ class Board
     true
   end
 
+  def find_king(color)
+    board.each_with_index do |lst, i|
+      lst.each_with_index do |elm, j|
+        return [i, j] if elm[0] == color && elm[1] == 'k'
+      end
+    end
+  end
+
+  def another_check?(position, destination, color)
+    i, j = position
+    u, v = destination
+    dest_val = board[u][v]
+    move([i, j], [u, v])
+    king_pos = find_king(color)
+    ans = in_check?(king_pos)
+
+    move([u, v], [i, j])
+    board[u][v] = dest_val
+    ans
+  end
+
+  def checkmate?(color)
+    board.each_with_index do |lst, i|
+      lst.each_with_index do |elm, j|
+        next unless elm[0] == color
+
+        case elm[1]
+        when 'k'
+          board.each_with_index do |another_list, u|
+            another_list.each_with_index do |_, v|
+              next unless valid_move_king?([i, j], [u, v])
+
+              return false unless another_check?([i, j], [u, v], color)
+            end
+          end
+        when 'n'
+          board.each_with_index do |another_list, u|
+            another_list.each_with_index do |_, v|
+              next unless valid_move_knight?([i, j], [u, v])
+
+              return false unless another_check?([i, j], [u, v], color)
+            end
+          end
+        when 'p'
+          board.each_with_index do |another_list, u|
+            another_list.each_with_index do |_, v|
+              next unless valid_move_pawn?([i, j], [u, v])
+
+              return false unless another_check?([i, j], [u, v], color)
+            end
+          end
+        when 'q'
+          board.each_with_index do |another_list, u|
+            another_list.each_with_index do |_, v|
+              next unless valid_move_queen?([i, j], [u, v])
+              return false unless another_check?([i, j], [u, v], color)
+            end
+          end
+        when 'b'
+          board.each_with_index do |another_list, u|
+            another_list.each_with_index do |_, v|
+              next unless valid_move_bishop?([i, j], [u, v])
+              return false unless another_check?([i, j], [u, v], color)
+            end
+          end
+        when 'r'
+          board.each_with_index do |another_list, u|
+            another_list.each_with_index do |_, v|
+              next unless valid_move_rook?([i, j], [u, v])
+
+              return false unless another_check?([i, j], [u, v], color)
+            end
+          end
+        end
+      end
+    end
+    true
+  end
+
   def in_check?(position)
     row_pos, col_pos = position
     color, = board[row_pos][col_pos].split('')
     board.each_with_index do |lst, i|
       lst.each_with_index do |elm, j|
         next unless elm[0] != color && elm[0] != '0'
-        return true if elm[1] == 'p' && valid_move_pawn?([i, j], [row_pos, col_pos])
-        return true if elm[1] == 'k' && valid_move_king?([i, j], [row_pos, col_pos])
-        return true if elm[1] == 'n' && valid_move_knight?([i, j], [row_pos, col_pos])
-        return true if elm[1] == 'b' && valid_move_bishop?([i, j], [row_pos, col_pos])
-        return true if elm[1] == 'r' && valid_move_rook?([i, j], [row_pos, col_pos])
-        return true if elm[1] == 'q' && valid_move_queen?([i, j], [row_pos, col_pos])
+
+        case elm[1]
+        when 'p'
+          return true if valid_move_pawn?([i, j], [row_pos, col_pos])
+        when 'k'
+          return true if valid_move_king?([i, j], [row_pos, col_pos])
+        when 'n'
+          return true if valid_move_knight?([i, j], [row_pos, col_pos])
+        when 'b'
+          return true if valid_move_bishop?([i, j], [row_pos, col_pos])
+        when 'r'
+          return true if valid_move_rook?([i, j], [row_pos, col_pos])
+        when 'q'
+          return true if valid_move_queen?([i, j], [row_pos, col_pos])
+        end
       end
     end
     false
@@ -179,7 +267,7 @@ class Board
         return true unless board[row][right] == '000'
 
         check = row + 1
-        unless inbound?(check.right) && board[check][right][..1] == 'bp' && @current_moves[board[check][right]] == 1
+        unless inbound?(check, right) && board[check][right][..1] == 'bp' && @current_moves[board[check][right]] == 1
           return false
         end
 
@@ -215,7 +303,7 @@ class Board
         return true unless board[row][right] == '000'
 
         check = row - 1
-        unless inbound?(check.right) && board[check][right][..1] == 'wp' && @current_moves[board[check][right]] == 1
+        unless inbound?(check, right) && board[check][right][..1] == 'wp' && @current_moves[board[check][right]] == 1
           return false
         end
 
