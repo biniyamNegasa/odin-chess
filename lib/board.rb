@@ -158,7 +158,8 @@ class Board
       if board[destination[0]][destination[1]] == '000'
         if destination == [row, position[1]]
           return true
-        elsif inbound?(row, position[1]) && board[row][position[1]] == '000' && destination == [row - 1, position[1]]
+        elsif inbound?(row, position[1]) && board[row][position[1]] == '000' &&
+              @current_moves[curr].zero? && destination == [row - 1, position[1]]
           return true
         end
       end
@@ -193,7 +194,8 @@ class Board
       if board[destination[0]][destination[1]] == '000'
         if destination == [row, position[1]]
           return true
-        elsif inbound?(row, position[1]) && board[row][position[1]] == '000' && destination == [row + 1, position[1]]
+        elsif inbound?(row, position[1]) && board[row][position[1]] == '000' &&
+              @current_moves[curr].zero? && destination == [row + 1, position[1]]
           return true
         end
       end
