@@ -58,19 +58,6 @@ class Board
     end
   end
 
-  def another_check?(position, destination, color)
-    i, j = position
-    u, v = destination
-    dest_val = board[u][v]
-    move([i, j], [u, v])
-    king_pos = find_king(color)
-    ans = in_check?(king_pos)
-
-    move([u, v], [i, j])
-    board[u][v] = dest_val
-    ans
-  end
-
   def checkmate?(color)
     board.each_with_index do |lst, i|
       lst.each_with_index do |elm, j|
@@ -371,6 +358,19 @@ class Board
     directions.any? do |r, c|
       destination == [position[0] + r, position[1] + c]
     end
+  end
+
+  def another_check?(position, destination, color)
+    i, j = position
+    u, v = destination
+    dest_val = board[u][v]
+    move([i, j], [u, v])
+    king_pos = find_king(color)
+    ans = in_check?(king_pos)
+
+    move([u, v], [i, j])
+    board[u][v] = dest_val
+    ans
   end
 
   def initial_position
